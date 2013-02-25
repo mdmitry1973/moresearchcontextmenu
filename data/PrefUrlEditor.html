@@ -1,0 +1,310 @@
+﻿<!DOCTYPE html>
+<html>
+ 
+<head>
+<!--title>Mozilla CSS Getting Started - JavaScript demonstration</title-->
+<link rel="stylesheet" type="text/css" href="PrefUrlEditor.css" />
+<!--script type="text/javascript" src="PrefUrlEditor.js"></script-->
+<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+<meta content="utf-8" http-equiv="encoding">
+<script type="text/javascript">
+    
+    var id_index = 0;
+	var arrLocalizeStrings = [];
+	
+	arrLocalizeStrings.push("Edit");
+	arrLocalizeStrings.push("Remove");
+   
+   function init_table()
+   {
+		var jsonRequesLocalizeStrings = JSON.stringify(arrLocalizeStrings);
+		
+		document.documentElement.addEventListener("SendSearchEngines", function(event) {
+        //window.alert(event.detail);
+		
+        var tbl = document.getElementById("table_Engines");
+        var tblBody = document.getElementById("tbody_Engines");
+		var message = JSON.parse(event.detail);
+		var jsObject = message.engines;
+		var jsLocalizeStrings = message.arrLocalizeStrings;
+		
+		arrLocalizeStrings = [];
+		arrLocalizeStrings = jsLocalizeStrings;
+        
+        for (var i = 0; i < jsObject.length; i++)
+        {
+            // creates a table row
+            var row = document.createElement("tr");
+            
+            row.id = "id_row_" + id_index;
+           
+            var cell = document.createElement("td");
+            var cellText = document.createElement("input");
+            cellText.type = "text";
+            cellText.readonly = true;
+            cellText.disabled= true;
+            cellText.value = jsObject[i].label;  
+            cell.appendChild(cellText);
+            row.appendChild(cell);
+            
+            var cell = document.createElement("td");
+            var cellText = document.createElement("input");
+            cellText.type = "text";
+            cellText.size=40;
+            cellText.readonly = true;
+            cellText.disabled= true;
+            cellText.value = jsObject[i].url;            
+            cell.appendChild(cellText);
+            row.appendChild(cell);
+            
+            var cell = document.createElement("td");
+            var cellImage = document.createElement("input");
+            cellImage.type = "image";
+            cellImage.src = "edit.png";
+            cellImage.id = "id_edit_" + id_index;
+            cellImage.name="ShowToolTip"; 
+            cellImage.title=arrLocalizeStrings[0];
+            cellImage.addEventListener('mouseover', onShowToolTip, false);
+            cellImage.onclick = function(event){doEdit(event);};
+            cell.appendChild(cellImage);
+            row.appendChild(cell);
+            
+            var cell = document.createElement("td");
+            var cellImage = document.createElement("input");
+            cellImage.type = "image";
+            cellImage.src = "delete.png";
+            cellImage.id = "id_del_" + id_index;
+            cellImage.name="ShowToolTip"; 
+            cellImage.title=arrLocalizeStrings[1];
+            cellImage.addEventListener('mouseover', onShowToolTip, false);
+            cellImage.onclick = function(event){doDelete(event);};
+            cell.appendChild(cellImage);
+            row.appendChild(cell);
+           
+           // add the row to the end of the table body
+            tblBody.appendChild(row);
+            
+            id_index++;
+        }
+        
+      }, false);
+      
+        var event = document.createEvent('CustomEvent');
+        event.initCustomEvent("RequesSearchEngines", true, true, jsonRequesLocalizeStrings);
+        document.documentElement.dispatchEvent(event);
+        
+        var elements = document.getElementsByName("ShowToolTip");
+
+        for (var i = 0; i < elements.length; i++) 
+        {
+            elements[i].addEventListener('mouseover', onShowToolTip, false);
+        }
+   }
+   
+   function doAdd()
+   {
+        var  NameInput = document.getElementById("Name");
+        var RequestUrlInput = document.getElementById("RequestUrl");
+       
+       if (NameInput.value.length &&
+           RequestUrlInput.value.length)
+       {
+            //window.alert(RequestUrlInput.value);
+            
+            var tblBody = document.getElementById("tbody_Engines");
+            
+            // creates a table row
+            var row = document.createElement("tr");
+            
+            row.id = "id_row_" + id_index;
+           
+            var cell = document.createElement("td");
+            var cellText = document.createElement("input");
+            cellText.type = "text";
+            cellText.readonly = true;
+            cellText.disabled= true;
+            cellText.value = NameInput.value;  
+            cell.appendChild(cellText);
+            row.appendChild(cell);
+            
+            var cell = document.createElement("td");
+            var cellText = document.createElement("input");
+            cellText.type = "text";
+            cellText.size=40;
+            cellText.readonly = true;
+            cellText.disabled= true;
+            cellText.value = RequestUrlInput.value;  
+            cell.appendChild(cellText);
+            row.appendChild(cell);
+            
+            var cell = document.createElement("td");
+            var cellImage = document.createElement("input");
+            cellImage.type = "image";
+            cellImage.src = "edit.png";
+            cellImage.id = "id_edit_" + id_index;
+            cellImage.name="ShowToolTip"; 
+            cellImage.title=arrLocalizeStrings[0];//"Edit";
+            cellImage.addEventListener('mouseover', onShowToolTip, false);
+            cellImage.onclick = function(event){doEdit(event);};
+            cell.appendChild(cellImage);
+            row.appendChild(cell);
+            
+            var cell = document.createElement("td");
+            var cellImage = document.createElement("input");
+            cellImage.type = "image";
+            cellImage.src = "delete.png";
+            cellImage.id = "id_del_" + id_index;
+            cellImage.name="ShowToolTip"; 
+            cellImage.title=arrLocalizeStrings[1];//"Remove";
+            cellImage.addEventListener('mouseover', onShowToolTip, false);
+            cellImage.onclick = function(event){doDelete(event);};
+            cell.appendChild(cellImage);
+            row.appendChild(cell);
+           
+           // add the row to the end of the table body
+            tblBody.appendChild(row);
+            
+            id_index++;
+       }
+   }
+   
+   function doDelete(evt)
+   {
+       //window.alert(evt);
+       
+       var id = evt.currentTarget.id;
+       
+       id =id.replace("id_del_", "id_row_");
+       
+        var  node = document.getElementById(id);
+       
+        if (node && node.parentNode) 
+        {
+             node.parentNode.removeChild(node);
+        }
+   }
+   
+   function doEdit(evt)
+   {
+        //window.alert(evt.currentTarget.id);
+        
+        var id = evt.currentTarget.id;
+       
+       id =id.replace("id_edit_", "id_row_");
+       
+        var  node = document.getElementById(id);
+        
+       if (node) 
+        {
+            var children = node.childNodes;//evaluateXPath(node, "/td/input");
+            var breadonly = true;
+            
+            for (var i = 0; i < children.length; i++) 
+            {
+                if (i == 0 || i == 1)
+                {
+                    if (i == 0)
+                    {
+                        breadonly = !(children[i].childNodes[0].readonly);
+                    }
+                    
+                    children[i].childNodes[0].readonly = breadonly;
+                    children[i].childNodes[0].disabled= breadonly; 
+                }
+                else
+                if (i == 2)
+                {
+                    if (breadonly)
+                    {
+                        children[i].childNodes[0].src = "edit.png";
+                    }
+                    else
+                    {
+                        children[i].childNodes[0].src = "edit_2.png";
+                    }
+                }
+            }
+            
+            if (!breadonly)
+            {
+                //doSave();
+            }
+        }
+   }
+   
+    // Evaluate an XPath expression aExpression against a given DOM node
+    // or Document object (aNode), returning the results as an array
+    // thanks wanderingstan at morethanwarm dot mail dot com for the
+    // initial work.
+    function evaluateXPath(aNode, aExpr) {
+      var xpe = new XPathEvaluator();
+      var nsResolver = xpe.createNSResolver(aNode.ownerDocument == null ?
+        aNode.documentElement : aNode.ownerDocument.documentElement);
+      var result = xpe.evaluate(aExpr, aNode, nsResolver, 0, null);
+      var found = [];
+      var res;
+      while (res = result.iterateNext())
+        found.push(res);
+      return found;
+    }
+   
+   function doSave()
+   {
+       var tblBody = document.getElementById("tbody_Engines");
+       
+       var results = evaluateXPath(tblBody, "//tr/td/input");
+       
+       var listData = [];
+       
+       for (var i = 0; i < results.length; i = i + 4)
+       {
+           
+            var objItem = { label:   results[i].value,  
+                            url:   results[i + 1].value};
+        
+            listData.push(objItem);
+       }
+           // alert("Person #" + i + " has the last name " + results[i].value);
+        var jsonString = JSON.stringify(listData);
+        
+        var event = document.createEvent('CustomEvent');
+        event.initCustomEvent("StoreData", true, true, jsonString);
+        document.documentElement.dispatchEvent(event);
+       //if (parg.hasChildNodes()) 
+       //{
+       //   var children = parg.childNodes;
+         
+        //  for (var i = 0; i < children.length; i++) 
+        //  {
+            // do something with each child as children[i]
+            // NOTE: List is live, Adding or removing children will change the list
+        //  }
+        //}
+   }
+   
+   function onShowToolTip(element) {
+   
+        var event = document.createEvent('CustomEvent');
+        event.initCustomEvent("ShowToolTip", true, true, element.currentTarget.title);
+        document.documentElement.dispatchEvent(event);
+    
+    }
+
+    
+
+</script>
+
+</head>
+ 
+<body onload="init_table();">
+<h4 data-l10n-id="Title_Page_id">Manager Search Engines</h4>
+<span data-l10n-id="Instruction_id">You need to use {0} in search request url, where you want to insert a search string.</span><br/><br/>
+<span data-l10n-id="Name_id">Name:</span> <input type="text" name="Name" id="Name" title="Enter engine name"/><br/>
+<span data-l10n-id="Request_url_id">Request url:</span> <input type="text" title="Enter request string" name="RequestUrl" id="RequestUrl" size="50"/>
+<input type="image" name="ShowToolTip" title="Add new item" src="add.png" onclick="doAdd()">
+<input type="image" name="ShowToolTip" title="Save all items in storage" src="save.png" onclick="doSave()"/><br />
+<table id="table_Engines" border="0"><tbody id="tbody_Engines"></tbody></table>
+          
+</body>
+
+</html>
