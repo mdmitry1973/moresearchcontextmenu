@@ -2,9 +2,7 @@
 <html>
  
 <head>
-<!--title>Mozilla CSS Getting Started - JavaScript demonstration</title-->
 <link rel="stylesheet" type="text/css" href="PrefUrlEditor.css" />
-<!--script type="text/javascript" src="PrefUrlEditor.js"></script-->
 <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
 <meta content="utf-8" http-equiv="encoding">
 <script type="text/javascript">
@@ -14,26 +12,14 @@
 	
 	arrLocalizeStrings.push("Edit");
 	arrLocalizeStrings.push("Remove");
-   
-   function init_table()
-   {
-		var jsonRequesLocalizeStrings = JSON.stringify(arrLocalizeStrings);
-		
-		document.documentElement.addEventListener("SendSearchEngines", function(event) {
-        //window.alert(event.detail);
-		
-        var tbl = document.getElementById("table_Engines");
-        var tblBody = document.getElementById("tbody_Engines");
-		var message = JSON.parse(event.detail);
-		var jsObject = message.engines;
-		var jsLocalizeStrings = message.arrLocalizeStrings;
-		
-		arrLocalizeStrings = [];
-		arrLocalizeStrings = jsLocalizeStrings;
-        
-        for (var i = 0; i < jsObject.length; i++)
-        {
-            // creates a table row
+	arrLocalizeStrings.push("Up");		//2
+	arrLocalizeStrings.push("Down");	//3
+	arrLocalizeStrings.push("Top");		//4
+	arrLocalizeStrings.push("Bottom");	//5
+	
+	function add_Item(id_index, tblBody, label, url)
+	{
+			// creates a table row
             var row = document.createElement("tr");
             
             row.id = "id_row_" + id_index;
@@ -43,7 +29,8 @@
             cellText.type = "text";
             cellText.readonly = true;
             cellText.disabled= true;
-            cellText.value = jsObject[i].label;  
+			cellText.id = "id_text_" + id_index;
+            cellText.value = label;  
             cell.appendChild(cellText);
             row.appendChild(cell);
             
@@ -53,7 +40,8 @@
             cellText.size=40;
             cellText.readonly = true;
             cellText.disabled= true;
-            cellText.value = jsObject[i].url;            
+			cellText.id = "id_url_" + id_index;
+            cellText.value = url;            
             cell.appendChild(cellText);
             row.appendChild(cell);
             
@@ -80,10 +68,79 @@
             cellImage.onclick = function(event){doDelete(event);};
             cell.appendChild(cellImage);
             row.appendChild(cell);
+			
+			var cell = document.createElement("td");
+			var cellImage = document.createElement("input");
+			cellImage.type = "image";
+			cellImage.src = "upup.png";
+			cellImage.id = "id_upup_" + id_index;
+			cellImage.name="ShowToolTip"; 
+			cellImage.title=arrLocalizeStrings[4];
+			cellImage.addEventListener('mouseover', onShowToolTip, false);
+			cellImage.onclick = function(event){doUpUp(event);};
+			cell.appendChild(cellImage);
+			row.appendChild(cell);
+			
+			var cell = document.createElement("td");
+			var cellImage = document.createElement("input");
+			cellImage.type = "image";
+			cellImage.src = "up.png";
+			cellImage.id = "id_up_" + id_index;
+			cellImage.name="ShowToolTip"; 
+			cellImage.title=arrLocalizeStrings[2];
+			cellImage.addEventListener('mouseover', onShowToolTip, false);
+			cellImage.onclick = function(event){doUp(event);};
+			cell.appendChild(cellImage);
+			row.appendChild(cell);
+			
+			var cell = document.createElement("td");
+			var cellImage = document.createElement("input");
+			cellImage.type = "image";
+			cellImage.src = "down.png";
+			cellImage.id = "id_down_" + id_index;
+			cellImage.name="ShowToolTip"; 
+			cellImage.title=arrLocalizeStrings[3];
+			cellImage.addEventListener('mouseover', onShowToolTip, false);
+			cellImage.onclick = function(event){doDown(event);};
+			cell.appendChild(cellImage);
+			row.appendChild(cell);
+			
+			var cell = document.createElement("td");
+			var cellImage = document.createElement("input");
+			cellImage.type = "image";
+			cellImage.src = "downdown.png";
+			cellImage.id = "id_downdown_" + id_index;
+			cellImage.name="ShowToolTip"; 
+			cellImage.title=arrLocalizeStrings[5];
+			cellImage.addEventListener('mouseover', onShowToolTip, false);
+			cellImage.onclick = function(event){doDownDown(event);};
+			cell.appendChild(cellImage);
+			row.appendChild(cell);
            
            // add the row to the end of the table body
             tblBody.appendChild(row);
-            
+	}
+   
+   function init_table()
+   {
+		var jsonRequesLocalizeStrings = JSON.stringify(arrLocalizeStrings);
+		
+		document.documentElement.addEventListener("SendSearchEngines", function(event) {
+        //window.alert(event.detail);
+		
+        var tbl = document.getElementById("table_Engines");
+        var tblBody = document.getElementById("tbody_Engines");
+		var message = JSON.parse(event.detail);
+		var jsObject = message.engines;
+		var jsLocalizeStrings = message.arrLocalizeStrings;
+		
+		arrLocalizeStrings = [];
+		arrLocalizeStrings = jsLocalizeStrings;
+        
+        for (var i = 0; i < jsObject.length; i++)
+        {
+            add_Item(id_index, tblBody, jsObject[i].label, jsObject[i].url);
+			
             id_index++;
         }
         
@@ -101,6 +158,97 @@
         }
    }
    
+   function doUp(evt)
+   {
+		var id = evt.currentTarget.id;
+       
+		id =id.replace("id_up_", "id_row_");
+	   
+		var  node = document.getElementById(id);
+		var  parentNode = node.parentNode;
+	   
+		if (node && parentNode) 
+        {
+			var previousSibling = node.previousSibling;
+			
+			if (previousSibling)
+			{
+				var oldNode = parentNode.removeChild(node);
+				
+				parentNode.insertBefore( oldNode, previousSibling );
+				
+				doCheckEnable();
+			}
+        }
+   }
+   
+   function doUpUp(evt)
+   {
+       var id = evt.currentTarget.id;
+       
+       id =id.replace("id_upup_", "id_row_");
+	   
+		var  node = document.getElementById(id);
+		var  parentNode = node.parentNode;
+	   
+		if (node && parentNode) 
+        {
+			var firstChild = parentNode.firstChild;
+			
+			if (firstChild && firstChild != node)
+			{
+				var oldNode = parentNode.removeChild(node);
+				
+				parentNode.insertBefore( oldNode, firstChild);
+				
+				doCheckEnable();
+			}
+        }
+   }
+   
+   function doDown(evt)
+   {
+       var id = evt.currentTarget.id;
+       
+       id =id.replace("id_down_", "id_row_");
+	   
+	   var  node = document.getElementById(id);
+		var  parentNode = node.parentNode;
+	   
+		if (node && parentNode) 
+        {
+			var nextSibling = node.nextSibling;
+			
+			if (nextSibling)
+			{
+				var oldNode = parentNode.removeChild(nextSibling);
+				
+				parentNode.insertBefore( oldNode, node);
+				
+				doCheckEnable();
+			}
+        }
+   }
+   
+   function doDownDown(evt)
+   {
+       var id = evt.currentTarget.id;
+       
+       id =id.replace("id_downdown_", "id_row_");
+	   
+	   var  node = document.getElementById(id);
+		var  parentNode = node.parentNode;
+	   
+		if (node && parentNode) 
+        {
+			var oldNode = parentNode.removeChild(node);
+				
+			parentNode.appendChild(oldNode);
+			
+			doCheckEnable();
+        }
+   }
+   
    function doAdd()
    {
         var  NameInput = document.getElementById("Name");
@@ -112,57 +260,8 @@
             //window.alert(RequestUrlInput.value);
             
             var tblBody = document.getElementById("tbody_Engines");
-            
-            // creates a table row
-            var row = document.createElement("tr");
-            
-            row.id = "id_row_" + id_index;
-           
-            var cell = document.createElement("td");
-            var cellText = document.createElement("input");
-            cellText.type = "text";
-            cellText.readonly = true;
-            cellText.disabled= true;
-            cellText.value = NameInput.value;  
-            cell.appendChild(cellText);
-            row.appendChild(cell);
-            
-            var cell = document.createElement("td");
-            var cellText = document.createElement("input");
-            cellText.type = "text";
-            cellText.size=40;
-            cellText.readonly = true;
-            cellText.disabled= true;
-            cellText.value = RequestUrlInput.value;  
-            cell.appendChild(cellText);
-            row.appendChild(cell);
-            
-            var cell = document.createElement("td");
-            var cellImage = document.createElement("input");
-            cellImage.type = "image";
-            cellImage.src = "edit.png";
-            cellImage.id = "id_edit_" + id_index;
-            cellImage.name="ShowToolTip"; 
-            cellImage.title=arrLocalizeStrings[0];//"Edit";
-            cellImage.addEventListener('mouseover', onShowToolTip, false);
-            cellImage.onclick = function(event){doEdit(event);};
-            cell.appendChild(cellImage);
-            row.appendChild(cell);
-            
-            var cell = document.createElement("td");
-            var cellImage = document.createElement("input");
-            cellImage.type = "image";
-            cellImage.src = "delete.png";
-            cellImage.id = "id_del_" + id_index;
-            cellImage.name="ShowToolTip"; 
-            cellImage.title=arrLocalizeStrings[1];//"Remove";
-            cellImage.addEventListener('mouseover', onShowToolTip, false);
-            cellImage.onclick = function(event){doDelete(event);};
-            cell.appendChild(cellImage);
-            row.appendChild(cell);
-           
-           // add the row to the end of the table body
-            tblBody.appendChild(row);
+			
+			add_Item(id_index, tblBody, NameInput.value, RequestUrlInput.value);
             
             id_index++;
        }
@@ -252,17 +351,21 @@
    {
        var tblBody = document.getElementById("tbody_Engines");
        
-       var results = evaluateXPath(tblBody, "//tr/td/input");
+       var results = evaluateXPath(tblBody, "//tr");
        
        var listData = [];
        
-       for (var i = 0; i < results.length; i = i + 4)
+       for (var i = 0; i < results.length; i++)
        {
-           
-            var objItem = { label:   results[i].value,  
-                            url:   results[i + 1].value};
-        
-            listData.push(objItem);
+			var resultInputs = evaluateXPath(results[i], "./td/input");
+			
+			if (resultInputs.length > 1)
+			{
+				var objItem = { label: resultInputs[0].value,  
+								url:   resultInputs[1].value};
+								
+				listData.push(objItem);
+			}
        }
            // alert("Person #" + i + " has the last name " + results[i].value);
         var jsonString = JSON.stringify(listData);
