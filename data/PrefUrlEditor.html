@@ -17,23 +17,25 @@
 	arrLocalizeStrings.push("Top");		//4
 	arrLocalizeStrings.push("Bottom");	//5
 	
-	function add_Item(id_index, tblBody, label, url)
+	function add_Item(id_index, tblBody, label, url, check)
 	{
 			// creates a table row
             var row = document.createElement("tr");
             
             row.id = "id_row_" + id_index;
            
+			//0
             var cell = document.createElement("td");
             var cellText = document.createElement("input");
             cellText.type = "text";
             cellText.readonly = true;
-            cellText.disabled= true;
+            cellText.disabled = true;
 			cellText.id = "id_text_" + id_index;
             cellText.value = label;  
             cell.appendChild(cellText);
             row.appendChild(cell);
             
+			//1
             var cell = document.createElement("td");
             var cellText = document.createElement("input");
             cellText.type = "text";
@@ -45,6 +47,7 @@
             cell.appendChild(cellText);
             row.appendChild(cell);
             
+			//2
             var cell = document.createElement("td");
             var cellImage = document.createElement("input");
             cellImage.type = "image";
@@ -57,6 +60,7 @@
             cell.appendChild(cellImage);
             row.appendChild(cell);
             
+			//3
             var cell = document.createElement("td");
             var cellImage = document.createElement("input");
             cellImage.type = "image";
@@ -69,6 +73,7 @@
             cell.appendChild(cellImage);
             row.appendChild(cell);
 			
+			//4
 			var cell = document.createElement("td");
 			var cellImage = document.createElement("input");
 			cellImage.type = "image";
@@ -81,6 +86,7 @@
 			cell.appendChild(cellImage);
 			row.appendChild(cell);
 			
+			//5
 			var cell = document.createElement("td");
 			var cellImage = document.createElement("input");
 			cellImage.type = "image";
@@ -93,6 +99,7 @@
 			cell.appendChild(cellImage);
 			row.appendChild(cell);
 			
+			//6
 			var cell = document.createElement("td");
 			var cellImage = document.createElement("input");
 			cellImage.type = "image";
@@ -105,15 +112,20 @@
 			cell.appendChild(cellImage);
 			row.appendChild(cell);
 			
+			//7
 			var cell = document.createElement("td");
 			var cellImage = document.createElement("input");
-			cellImage.type = "image";
-			cellImage.src = "downdown.png";
+			cellImage.type = "checkbox";
+			//cellImage.src = "downdown.png";
 			cellImage.id = "id_downdown_" + id_index;
-			cellImage.name="ShowToolTip"; 
-			cellImage.title=arrLocalizeStrings[5];
-			cellImage.addEventListener('mouseover', onShowToolTip, false);
-			cellImage.onclick = function(event){doDownDown(event);};
+			cellImage.name="";//"ShowToolTip"; 
+			cellImage.title="";
+			if (check == null || check == "true")
+				cellImage.checked = true;
+			else
+				cellImage.checked = false;
+			//cellImage.addEventListener('mouseover', onShowToolTip, false);
+			//cellImage.onclick = function(event){doDownDown(event);};
 			cell.appendChild(cellImage);
 			row.appendChild(cell);
            
@@ -139,7 +151,12 @@
         
         for (var i = 0; i < jsObject.length; i++)
         {
-            add_Item(id_index, tblBody, jsObject[i].label, jsObject[i].url);
+            var cheched = "true";
+			
+			if (jsObject[i].hasOwnProperty("check"))
+				cheched = jsObject[i].check;
+			
+			add_Item(id_index, tblBody, jsObject[i].label, jsObject[i].url, cheched);
 			
             id_index++;
         }
@@ -251,20 +268,20 @@
    
    function doAdd()
    {
-        var  NameInput = document.getElementById("Name");
-        var RequestUrlInput = document.getElementById("RequestUrl");
-       
-       if (NameInput.value.length &&
-           RequestUrlInput.value.length)
-       {
-            //window.alert(RequestUrlInput.value);
-            
-            var tblBody = document.getElementById("tbody_Engines");
+		var NameInput = document.getElementById("Name");
+		var RequestUrlInput = document.getElementById("RequestUrl");
+
+		if (NameInput.value.length &&
+		   RequestUrlInput.value.length)
+		{
+			//window.alert(RequestUrlInput.value);
+			
+			var tblBody = document.getElementById("tbody_Engines");
 			
 			add_Item(id_index, tblBody, NameInput.value, RequestUrlInput.value);
-            
-            id_index++;
-       }
+			
+			id_index++;
+		}
    }
    
    function doDelete(evt)
@@ -361,8 +378,16 @@
 			
 			if (resultInputs.length > 1)
 			{
+				var checked = "true";
+				
+				//window.alert(resultInputs[7].checked);
+				
+				if (resultInputs[7].checked == false)
+					checked = "false";
+				
 				var objItem = { label: resultInputs[0].value,  
-								url:   resultInputs[1].value};
+								url:   resultInputs[1].value,
+								check: checked};
 								
 				listData.push(objItem);
 			}
